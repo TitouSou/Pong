@@ -5,10 +5,14 @@ let startTime = Date.now();
 let score = (Date.now() - startTime) / 1000;
 let speedCoef = 1;
 let rafId;
-let xSpeed = 1;
-let ySpeed = 1;
-let x = 50;
-let y = 50;
+let xSpeed = 2;
+let ySpeed = 2;
+
+let ball = {
+    x : 50,
+    y : 50,
+    radius : 10
+}
 
 function startGame() {
     startTime = Date.now();
@@ -23,8 +27,14 @@ function update() {
     console.log(score);
     document.getElementById("score").innerHTML = score;
 
-    x += xSpeed;
-    y += ySpeed;
+    ball.x += xSpeed;
+    ball.y += ySpeed;
+    if (ball.x > canvas.width - ball.radius) xSpeed = -xSpeed;
+    if (ball.x < ball.radius) xSpeed = -xSpeed;
+    if (ball.y > canvas.height - ball.radius) ySpeed = -ySpeed;
+    if (ball.y < ball.radius) ySpeed = -ySpeed;
+    
+    
 }
 
 function loop() {
@@ -38,7 +48,7 @@ function drawBall() {
     ctx.fillStyle = "blue";
     //dessin de la balle
     ctx.beginPath();
-    ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2); 
     ctx.fill();
     ctx.closePath();
 }
