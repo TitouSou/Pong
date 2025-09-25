@@ -10,10 +10,12 @@ let rafId;
 let ball = {
     x : 50,
     y : 50,
-    xSpeed : 1,
+    xSpeed : Math.random() * 10 - 20,
     ySpeed : -1,
     radius : 10,
-    speedCoef : 1
+    speedCoef : 1,
+    initialSpeedX : 1,
+    initialSpeedY : 1
 }
 
 let barre = {
@@ -33,7 +35,7 @@ function startGame() {
 
     ball.x = Math.random() * (canvas.width - 2 * ball.radius) + ball.radius;
     ball.y = Math.random() * (canvas.height - 2 * ball.radius - canvas.height / 10) + ball.radius;
-    ball.xSpeed = 1;
+    ball.xSpeed = Math.random() * 10 - 20;
     ball.ySpeed = -1;
     ball.speedCoef = 1;
 
@@ -45,26 +47,28 @@ function startGame() {
 function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     score = Math.floor(( Date.now() - startTime ) / 1000);
-    console.log(score);
+    console.log(ball.xSpeed);
     document.getElementById("score").innerHTML = score;
 
-    ball.x += ball.xSpeed;
-    ball.y += ball.ySpeed;
+    ball.x += ball.xSpeed * ball.speedCoef;
+    ball.y += ball.ySpeed * ball.speedCoef;
     if (ball.x > canvas.width - ball.radius) {
-        ball.xSpeed = -ball.xSpeed * ball.speedCoef;
-        if (ball.speedCoef < 5) ball.speedCoef += 0.02;
+        ball.xSpeed = -ball.xSpeed;
+        if (ball.speedCoef < 5) ball.speedCoef += 0.03;
     }
     if (ball.x < ball.radius) {
-        ball.xSpeed = -ball.xSpeed * ball.speedCoef;
-        if (ball.speedCoef < 5) ball.speedCoef += 0.02;
+        ball.xSpeed = -ball.xSpeed;
+        if (ball.speedCoef < 5) ball.speedCoef += 0.03;
     }
     if (ball.y < ball.radius) {
-        ball.ySpeed = -ball.ySpeed * ball.speedCoef;
-        if (ball.speedCoef < 5) ball.speedCoef += 0.02;
+        ball.ySpeed = -ball.ySpeed;
+        if (Math.abs(ball.xSpeed) != ball.initialSpeedX) ball.xSpeed = ball.initialSpeedX;
+        if (Math.abs(ball.ySpeed) != ball.initialSpeedY) ball.ySpeed = ball.initialSpeedY;
+        if (ball.speedCoef < 5) ball.speedCoef += 0.03;
     }
-    if (ball.y + ball.radius > barre.y && ball.y + ball.radius < barre.y + 5 && ball.x > barre.x && ball.x < barre.x + barre.lenght) {
-        ball.ySpeed = -ball.ySpeed * ball.speedCoef;
-        if (ball.speedCoef < 5) ball.speedCoef += 0.02;
+    if (ball.y + ball.radius > barre.y && ball.y + ball.radius < barre.y + 5 && ball.x + ball.radius > barre.x && ball.x - ball.radius < barre.x + barre.lenght) {
+        ball.ySpeed = -ball.ySpeed;
+        if (ball.speedCoef < 5) ball.speedCoef += 0.03;
     }
     if (ball.y > canvas.height - ball.radius) {
         loseScreen();
