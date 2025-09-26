@@ -1,5 +1,8 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
+let monStockage = localStorage;
+localStorage.setItem("meilleurScore", 0);
+document.getElementById("meilleurScore").innerHTML = monStockage.getItem("meilleurScore");
 
 let startTime = Date.now();
 let score = (Date.now() - startTime) / 1000;
@@ -8,14 +11,14 @@ let rafId;
 
 
 let ball = {
-    x : 50,
-    y : 50,
-    xSpeed : Math.random() * 10 - 20,
-    ySpeed : -1,
+    x : canvas.width / 2,
+    y : canvas.height - canvas.height / 10,
+    xSpeed : Math.random() * 2 - 1,
+    ySpeed : -1.5,
     radius : 10,
     speedCoef : 1,
-    initialSpeedX : 1,
-    initialSpeedY : 1
+    initialSpeedX : 1.5,
+    initialSpeedY : 1.5
 }
 
 let barre = {
@@ -33,10 +36,10 @@ function startGame() {
     startTime = Date.now();
     score = 0;
 
-    ball.x = Math.random() * (canvas.width - 2 * ball.radius) + ball.radius;
-    ball.y = Math.random() * (canvas.height - 2 * ball.radius - canvas.height / 10) + ball.radius;
-    ball.xSpeed = Math.random() * 10 - 20;
-    ball.ySpeed = -1;
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height - canvas.height / 10;
+    ball.xSpeed = Math.random() * 2 - 1;
+    ball.ySpeed = -ball.initialSpeedY;
     ball.speedCoef = 1;
 
     update();
@@ -49,7 +52,7 @@ function update() {
     score = Math.floor(( Date.now() - startTime ) / 1000);
     console.log(ball.xSpeed);
     document.getElementById("score").innerHTML = score;
-
+    
     ball.x += ball.xSpeed * ball.speedCoef;
     ball.y += ball.ySpeed * ball.speedCoef;
     if (ball.x > canvas.width - ball.radius) {
@@ -62,8 +65,9 @@ function update() {
     }
     if (ball.y < ball.radius) {
         ball.ySpeed = -ball.ySpeed;
-        if (Math.abs(ball.xSpeed) != ball.initialSpeedX) ball.xSpeed = ball.initialSpeedX;
-        if (Math.abs(ball.ySpeed) != ball.initialSpeedY) ball.ySpeed = ball.initialSpeedY;
+        if (Math.abs(ball.xSpeed) != ball.initialSpeedX && ball.xSpeed >= 0) ball.xSpeed = ball.initialSpeedX;
+        else if (Math.abs(ball.xSpeed) != ball.initialSpeedX && ball.xSpeed < 0) ball.xSpeed = -ball.initialSpeedX;
+        if (ball.ySpeed != ball.initialSpeedY) ball.ySpeed = ball.initialSpeedY;
         if (ball.speedCoef < 5) ball.speedCoef += 0.03;
     }
     if (ball.y + ball.radius > barre.y && ball.y + ball.radius < barre.y + 5 && ball.x + ball.radius > barre.x && ball.x - ball.radius < barre.x + barre.lenght) {
@@ -73,11 +77,15 @@ function update() {
     if (ball.y > canvas.height - ball.radius) {
         loseScreen();
         gameRunning = false;
+        if (score > monStockage.getItem("meilleurScore")) {
+            monStockage.setItem("meilleurScore", score);
+        }
+        document.getElementById("meilleurScore").innerHTML = monStockage.getItem("meilleurScore");
     }
 
     if (barre.movingLeft && barre.x > 0) barre.x -= barre.speed;
     if (barre.movingRight && barre.x + barre.lenght < canvas.width) barre.x += barre.speed; 
-    
+    range.disabled = gameRunning
 }
 
 function loop() {
@@ -117,14 +125,43 @@ reset.addEventListener("click", function() {
     startGame();
 });
 
-var left=document.getElementById("left");
-left.addEventListener("click", function() {
-    barre.x -= barre.speed;
+
+var left = document.getElementById("left");
+var right = document.getElementById("right");
+
+// Déplacement continu avec souris ou tactile
+left.addEventListener("mousedown", function() {
+    barre.movingLeft = true;
+});
+left.addEventListener("mouseup", function() {
+    barre.movingLeft = false;
+});
+left.addEventListener("mouseleave", function() {
+    barre.movingLeft = false;
+});
+left.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    barre.movingLeft = true;
+});
+left.addEventListener("touchend", function() {
+    barre.movingLeft = false;
 });
 
-var right=document.getElementById("right");
-right.addEventListener("click", function() {
-    barre.x += barre.speed;
+right.addEventListener("mousedown", function() {
+    barre.movingRight = true;
+});
+right.addEventListener("mouseup", function() {
+    barre.movingRight = false;
+});
+right.addEventListener("mouseleave", function() {
+    barre.movingRight = false;
+});
+right.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    barre.movingRight = true;
+});
+right.addEventListener("touchend", function() {
+    barre.movingRight = false;
 });
 
 document.addEventListener("keydown", (e) => {
@@ -157,3 +194,27 @@ document.addEventListener("keyup", (e) => {
             break;
     }
 });
+
+// gestion de la difficulté
+
+const range = document.getElementById("difficulty-range");
+
+const levels = ["Facile", "Normale", "Difficile"];
+
+range.addEventListener("input", () => {
+    if (levels[range.value] == "Facile") {
+        ball.initialSpeedX = 1;
+        ball.initialSpeedY = 1;
+    }
+    if (levels[range.value] == "Normale") {
+        ball.initialSpeedX = 1.5;
+        ball.initialSpeedY = 1.5;
+    }
+    if (levels[range.value] == "Difficile") {
+        ball.initialSpeedX = 2;
+        ball.initialSpeedY = 2;
+    }
+});
+
+drawBall();
+drawBarre();

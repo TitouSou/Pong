@@ -6,7 +6,7 @@
     <script src="https://kit.fontawesome.com/26f6084895.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <canvas id="board" height="500px" width="290px"></canvas>
+    <canvas id="board" height="480px" width="290px"></canvas>
 
     <div class="controls">
         <button id="reset"><span class="fa-solid fa-circle-play"></span></button>
@@ -14,6 +14,19 @@
         <button id="right"><span class="fa-solid fa-arrow-right"></span></button>
         <span id="score"></span>
     </div>
+    <div class="scores">
+        <p>Best Score : </p>
+        <span id="meilleurScore"></span>
+    </div>
+    <div class="difficulty-selector">
+        <div class="labels">
+            <span>Facile</span>
+            <span>Normale</span>
+            <span>Difficile</span>
+        </div>
+        <input type="range" min="0" max="2" step="1" value="1" id="difficulty-range">
+    </div>
+
 
     <script src="script/appPong.js"></script>
 </body>
